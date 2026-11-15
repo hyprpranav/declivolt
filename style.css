@@ -1,0 +1,789 @@
+/* ==============================================================================
+   DECLIVOLT: Downhill Energy Recovery & Smart Vehicle Control System
+   Clean, Responsive, Engineering-Grade Stylesheet
+   ============================================================================== */
+
+:root {
+  --bg-primary: #0b0f19;
+  --bg-secondary: #111827;
+  --bg-card: #182234;
+  --bg-card-hover: #1e2c42;
+  --border-color: #27354a;
+  --border-subtle: #1e293b;
+
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+
+  --color-connected: #10b981;
+  --color-disconnected: #ef4444;
+
+  --color-uphill: #f59e0b;
+  --color-downhill: #10b981;
+  --color-flat: #64748b;
+
+  --color-idle: #64748b;
+  --color-charging: #38bdf8;
+  --color-fast-charging: #10b981;
+
+  --color-ctrl-fwd: #059669;
+  --color-ctrl-stop: #dc2626;
+  --color-ctrl-back: #2563eb;
+
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --radius-lg: 12px;
+  --radius-md: 8px;
+  --radius-sm: 4px;
+}
+
+/* Reset & Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  min-height: 100vh;
+  padding: 24px 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.app-container {
+  width: 100%;
+  max-width: 1180px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* -----------------------------------------------------------------------------
+   Header & Connection Panel
+   ----------------------------------------------------------------------------- */
+.header {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.brand-title-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.brand-title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #38bdf8;
+  line-height: 1;
+}
+
+.brand-subtitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.brand-tagline {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.connection-panel {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.connection-status-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid var(--border-color);
+  padding: 8px 14px;
+  border-radius: 9999px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  transition: background-color 0.3s ease;
+}
+
+.status-dot.disconnected {
+  background-color: var(--color-disconnected);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+
+.status-dot.connected {
+  background-color: var(--color-connected);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.btn-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.btn-connect {
+  background: #0284c7;
+  color: #ffffff;
+  padding: 10px 20px;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.btn-connect:hover {
+  background: #0369a1;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+}
+
+.btn-connect.connected-mode {
+  background: #1e293b;
+  border: 1px solid #475569;
+  color: #f1f5f9;
+}
+
+.btn-connect.connected-mode:hover {
+  background: #334155;
+  border-color: #ef4444;
+  color: #fca5a5;
+}
+
+/* Alert Banner */
+.alert-banner {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fde68a;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.alert-banner.hidden {
+  display: none;
+}
+
+/* -----------------------------------------------------------------------------
+   Dashboard Grid & Cards
+   ----------------------------------------------------------------------------- */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  transition: border-color 0.2s ease;
+}
+
+.card:hover {
+  border-color: #3b4e6b;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.card-category {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #38bdf8;
+  text-transform: uppercase;
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.badge-charging.idle {
+  background: rgba(100, 116, 139, 0.2);
+  color: var(--color-idle);
+  border: 1px solid rgba(100, 116, 139, 0.3);
+}
+
+.badge-charging.charging {
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--color-charging);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+}
+
+.badge-charging.fast {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--color-fast-charging);
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);
+}
+
+.badge-slope.uphill {
+  background: rgba(245, 158, 11, 0.18);
+  color: var(--color-uphill);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+}
+
+.badge-slope.downhill {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--color-downhill);
+  border: 1px solid rgba(16, 185, 129, 0.5);
+}
+
+.badge-slope.neutral {
+  background: rgba(100, 116, 139, 0.2);
+  color: var(--color-flat);
+  border: 1px solid rgba(100, 116, 139, 0.3);
+}
+
+.badge-motor.stopped {
+  background: rgba(220, 38, 38, 0.18);
+  color: #f87171;
+  border: 1px solid rgba(220, 38, 38, 0.4);
+}
+
+.badge-motor.active {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+/* -----------------------------------------------------------------------------
+   CARD 1: Battery / Energy Recovery Visuals
+   ----------------------------------------------------------------------------- */
+.energy-display-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.battery-visual-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+.battery-cap {
+  width: 32px;
+  height: 8px;
+  background: #475569;
+  border-radius: 4px 4px 0 0;
+  border: 1px solid #334155;
+  border-bottom: none;
+}
+
+.battery-body {
+  width: 100%;
+  max-width: 260px;
+  height: 48px;
+  background: #0f172a;
+  border: 2px solid #475569;
+  border-radius: var(--radius-md);
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.battery-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0284c7 0%, #10b981 100%);
+  width: 0%;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.battery-icon-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.bolt-icon {
+  width: 26px;
+  height: 26px;
+  color: rgba(255, 255, 255, 0.3);
+  transition: color 0.3s ease, filter 0.3s ease;
+}
+
+.bolt-icon.active {
+  color: #fbbf24;
+  filter: drop-shadow(0 0 6px #f59e0b);
+}
+
+.battery-marks {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 260px;
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.metrics-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.metric-block {
+  text-align: center;
+  padding: 8px 4px;
+  flex: 1;
+  min-width: 130px;
+}
+
+.voltage-readout-wrap,
+.rpm-readout-wrap {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.metric-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.metric-value-large {
+  font-family: var(--font-mono);
+  font-size: 44px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.1;
+  margin: 4px 0;
+}
+
+.metric-unit {
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.adc-metric {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.card-subtext {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 12px;
+  line-height: 1.4;
+}
+
+/* -----------------------------------------------------------------------------
+   CARD 2: Slope Status & Telemetry
+   ----------------------------------------------------------------------------- */
+.slope-display-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.pitch-readout-wrap {
+  text-align: center;
+}
+
+.slope-visual-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.slope-indicator-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 18px;
+  border-radius: 9999px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  border: 1px solid var(--border-color);
+  background: rgba(15, 23, 42, 0.7);
+  transition: all 0.25s ease;
+}
+
+.slope-indicator-pill .indicator-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  background-color: var(--color-flat);
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.slope-indicator-pill.uphill {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.5);
+  color: var(--color-uphill);
+}
+.slope-indicator-pill.uphill .indicator-dot {
+  background-color: var(--color-uphill);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.8);
+}
+
+.slope-indicator-pill.downhill {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.5);
+  color: var(--color-downhill);
+}
+.slope-indicator-pill.downhill .indicator-dot {
+  background-color: var(--color-downhill);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+}
+
+.slope-indicator-pill.flat {
+  background: rgba(100, 116, 139, 0.15);
+  border-color: rgba(100, 116, 139, 0.4);
+  color: #cbd5e1;
+}
+.slope-indicator-pill.flat .indicator-dot {
+  background-color: var(--color-flat);
+  box-shadow: 0 0 6px rgba(100, 116, 139, 0.6);
+}
+
+.slope-indicator-pill.disconnected {
+  background: rgba(15, 23, 42, 0.5);
+  border-color: #334155;
+  color: var(--text-dim);
+}
+.slope-indicator-pill.disconnected .indicator-dot {
+  background-color: #475569;
+  box-shadow: none;
+}
+
+.recovery-status-banner {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #6ee7b7;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.recovery-status-banner.hidden {
+  display: none;
+}
+
+.telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 14px;
+}
+
+.telemetry-item {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  text-align: center;
+}
+
+.telemetry-axis {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.telemetry-val {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.telemetry-unit {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-left: 2px;
+}
+
+/* -----------------------------------------------------------------------------
+   CARD 3: Vehicle Control
+   ----------------------------------------------------------------------------- */
+.controls-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.btn-ctrl {
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #ffffff;
+  position: relative;
+  border: 1px solid transparent;
+}
+
+.ctrl-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.key-hint {
+  position: absolute;
+  right: 14px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.btn-forward {
+  background: #059669;
+}
+.btn-forward:not(:disabled):hover {
+  background: #10b981;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+.btn-stop {
+  background: #b91c1c;
+}
+.btn-stop:not(:disabled):hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+}
+
+.btn-backward {
+  background: #1d4ed8;
+}
+.btn-backward:not(:disabled):hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+}
+
+.btn-ctrl:disabled {
+  background: #1e293b;
+  color: #64748b;
+  border-color: #334155;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-ctrl:disabled .key-hint {
+  border-color: rgba(255, 255, 255, 0.05);
+  color: #475569;
+}
+
+.btn-ctrl.active-pressed {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+}
+
+.control-footer {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.control-notes code {
+  background: rgba(15, 23, 42, 0.8);
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--border-subtle);
+  color: #38bdf8;
+}
+
+.safety-note {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+
+/* -----------------------------------------------------------------------------
+   Footer: Hardware Reference
+   ----------------------------------------------------------------------------- */
+.footer {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 18px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 8px;
+}
+
+.footer-title {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+
+.footer-baud {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: #38bdf8;
+}
+
+.pinout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.pinout-col strong {
+  display: block;
+  color: var(--text-main);
+  margin-bottom: 4px;
+  font-size: 12.5px;
+}
+
+/* -----------------------------------------------------------------------------
+   Responsive Breakpoints
+   ----------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .connection-panel {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}

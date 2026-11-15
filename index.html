@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DECLIVOLT | Downhill Energy Recovery & Smart Vehicle Control System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Top Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="brand-title-wrap">
+          <h1 class="brand-title">DECLIVOLT</h1>
+          <p class="brand-subtitle">Downhill Energy Recovery System</p>
+        </div>
+        <p class="brand-tagline">Turning Downhill Motion into Electrical Energy.</p>
+      </div>
+
+      <div class="connection-panel">
+        <div class="connection-status-pill" id="connectionStatusBadge">
+          <span class="status-dot disconnected" id="connectionDot"></span>
+          <span class="status-label" id="connectionStatusText">DISCONNECTED</span>
+        </div>
+        <button id="connectBtn" class="btn btn-connect" type="button">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v6m0 8v6M4.93 4.93l4.24 4.24m5.66 5.66l4.24 4.24M2 12h6m8 0h6M4.93 19.07l4.24-4.24m5.66-5.66l4.24-4.24"/>
+          </svg>
+          <span id="connectBtnText">CONNECT</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Browser Compatibility Warning (Shown only if Web Serial is unsupported) -->
+    <div id="serialWarningBanner" class="alert-banner hidden">
+      <span class="alert-icon">⚠️</span>
+      <div class="alert-content">
+        <strong>Web Serial API Not Supported:</strong> Your current browser does not support Web Serial. Please open this dashboard in <strong>Google Chrome</strong>, <strong>Microsoft Edge</strong>, or another Chromium-based browser to connect to the ESP32.
+      </div>
+    </div>
+
+    <!-- Main Dashboard Grid -->
+    <main class="dashboard-grid">
+
+      <!-- CARD 1: ENERGY RECOVERY (Battery / Voltage / Wheel RPM) -->
+      <section class="card energy-card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="card-category">GENERATOR HARVEST</span>
+            <h2 class="card-title">ENERGY RECOVERY</h2>
+          </div>
+          <span class="badge badge-charging idle" id="chargingBadge">--</span>
+        </div>
+
+        <div class="energy-display-section">
+          <!-- Battery Graphical Indicator -->
+          <div class="battery-visual-container">
+            <div class="battery-cap"></div>
+            <div class="battery-body">
+              <div class="battery-fill" id="batteryFill" style="width: 0%;"></div>
+              <div class="battery-glow" id="batteryGlow"></div>
+              <div class="battery-icon-overlay">
+                <svg class="bolt-icon" id="chargingBoltIcon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                </svg>
+              </div>
+            </div>
+            <div class="battery-marks">
+              <span>0V</span>
+              <span>1.5V</span>
+              <span>3.0V+</span>
+            </div>
+          </div>
+
+          <!-- Generated Voltage & Live Wheel RPM Readouts -->
+          <div class="metrics-row">
+            <div class="metric-block voltage-readout-wrap">
+              <div class="metric-label">GENERATED VOLTAGE</div>
+              <div class="metric-value-large">
+                <span id="voltageValue">--</span>
+                <span class="metric-unit">V</span>
+              </div>
+              <div class="adc-metric">
+                ADC (GPIO 34): <span id="adcValue">--</span> / 4095
+              </div>
+            </div>
+
+            <div class="metric-block rpm-readout-wrap">
+              <div class="metric-label">WHEEL SPEED</div>
+              <div class="metric-value-large">
+                <span id="rpmValue">--</span>
+                <span class="metric-unit">RPM</span>
+              </div>
+              <div class="adc-metric">
+                Sensor: LM393 (GPIO 32)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-subtext">
+          Conceptual energy-harvesting indicator based on measured generator voltage. (No battery current or SOC measurement implemented)
+        </div>
+      </section>
+
+      <!-- CARD 2: SLOPE STATUS & TELEMETRY -->
+      <section class="card slope-card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="card-category">MPU6050 SENSOR</span>
+            <h2 class="card-title">SLOPE STATUS</h2>
+          </div>
+          <span class="badge badge-slope neutral" id="slopeBadge">--</span>
+        </div>
+
+        <!-- Slope Indicator Display -->
+        <div class="slope-display-section">
+          <!-- Pitch Angle Display -->
+          <div class="pitch-readout-wrap">
+            <div class="metric-label">PITCH ANGLE</div>
+            <div class="metric-value-large">
+              <span id="pitchValue">--</span>
+              <span class="metric-unit">°</span>
+            </div>
+          </div>
+
+          <!-- Small Visual Status Indicator (Only UPHILL, DOWNHILL or FLAT) -->
+          <div class="slope-visual-indicator" id="slopeVisualIndicator">
+            <div class="slope-indicator-pill disconnected" id="slopeIndicatorPill">
+              <span class="indicator-dot" id="slopeIndicatorDot"></span>
+              <span class="indicator-text" id="slopeIndicatorText">--</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Energy Recovery Notice Banner -->
+        <div class="recovery-status-banner hidden" id="recoveryBanner">
+          <span class="pulse-spark">⚡</span>
+          <span>DOWNHILL ENERGY RECOVERY ACTIVE &mdash; Generating voltage from incline descent</span>
+        </div>
+
+        <!-- Accelerometer Axes Sub-grid -->
+        <div class="telemetry-grid">
+          <div class="telemetry-item">
+            <span class="telemetry-axis">X Accel</span>
+            <span class="telemetry-val" id="accelX">--</span>
+            <span class="telemetry-unit">g</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="telemetry-axis">Y Accel</span>
+            <span class="telemetry-val" id="accelY">--</span>
+            <span class="telemetry-unit">g</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="telemetry-axis">Z Accel</span>
+            <span class="telemetry-val" id="accelZ">--</span>
+            <span class="telemetry-unit">g</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- CARD 3: VEHICLE CONTROL (L298N Drive Motors) -->
+      <section class="card control-card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="card-category">L298N DUAL H-BRIDGE</span>
+            <h2 class="card-title">VEHICLE CONTROL</h2>
+          </div>
+          <span class="badge badge-motor stopped" id="motorStateBadge">STOPPED</span>
+        </div>
+
+        <div class="controls-panel">
+          <button id="btnForward" class="btn btn-ctrl btn-forward" type="button" disabled title="Drive Forward (Key: W or Up Arrow)">
+            <svg class="ctrl-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 4l-8 8h6v8h4v-8h6z"/>
+            </svg>
+            <span>FORWARD</span>
+            <kbd class="key-hint">W / ↑</kbd>
+          </button>
+
+          <button id="btnStop" class="btn btn-ctrl btn-stop" type="button" disabled title="Stop Motors (Key: Space or X)">
+            <svg class="ctrl-icon" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="6" width="12" height="12" rx="2"/>
+            </svg>
+            <span>STOP</span>
+            <kbd class="key-hint">Space / X</kbd>
+          </button>
+
+          <button id="btnBackward" class="btn btn-ctrl btn-backward" type="button" disabled title="Drive Backward (Key: S or Down Arrow)">
+            <svg class="ctrl-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 20l8-8h-6V4h-4v8H4z"/>
+            </svg>
+            <span>BACKWARD</span>
+            <kbd class="key-hint">S / ↓</kbd>
+          </button>
+        </div>
+
+        <div class="control-footer">
+          <div class="control-notes">
+            <span>• Forward sends <code>F</code></span>
+            <span>• Backward sends <code>B</code></span>
+            <span>• Stop sends <code>S</code></span>
+          </div>
+          <p class="safety-note">Drive motors operate exclusively under manual control. Downhill slope detection does not override or trigger motor motion.</p>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Engineering & Pinout Reference Footer -->
+    <footer class="footer">
+      <div class="footer-header">
+        <span class="footer-title">HARDWARE CONFIGURATION REFERENCE</span>
+        <span class="footer-baud">115200 Baud | ESP32-WROOM-32</span>
+      </div>
+      <div class="pinout-grid">
+        <div class="pinout-col">
+          <strong>L298N Motor Driver</strong>
+          <div>ENA: GPIO 25 | IN1: GPIO 26 | IN2: GPIO 27 (Motor 1)</div>
+          <div>ENB: GPIO 33 | IN3: GPIO 14 | IN4: GPIO 13 (Motor 2)</div>
+        </div>
+        <div class="pinout-col">
+          <strong>MPU6050 Motion Sensor</strong>
+          <div>SDA: GPIO 21 | SCL: GPIO 22 | Address: 0x68</div>
+          <div>Threshold: ±3° Hysteresis | Flat Auto-Calibrated</div>
+        </div>
+        <div class="pinout-col">
+          <strong>Voltage Sensor (Generators)</strong>
+          <div>Signal: GPIO 34 (ADC1_CH6) | Factor: 7.5</div>
+          <div>Idle Threshold: ADC &gt; 20 (Noise Cutoff)</div>
+        </div>
+        <div class="pinout-col">
+          <strong>LM393 Speed Sensor (IR Slot)</strong>
+          <div>D0: GPIO 32 (Interrupt) | VCC: 3.3V | GND: GND</div>
+          <div>A0: Not connected | 20-Slot Encoder Disc</div>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
