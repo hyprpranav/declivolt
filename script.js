@@ -34,6 +34,7 @@ const pitchValue = document.getElementById('pitchValue');
 const slopeBadge = document.getElementById('slopeBadge');
 const slopeIndicatorPill = document.getElementById('slopeIndicatorPill');
 const slopeIndicatorText = document.getElementById('slopeIndicatorText');
+const horizonLine = document.getElementById('horizonLine');
 const recoveryBanner = document.getElementById('recoveryBanner');
 const accelX = document.getElementById('accelX');
 const accelY = document.getElementById('accelY');
@@ -279,6 +280,23 @@ function updateSlopeUI(pitch, slope, voltage) {
     slopeIndicatorPill.className = 'slope-indicator-pill ' + slope.toLowerCase();
   }
 
+  // Update visual gyro horizon line tilt
+  if (horizonLine) {
+    const clampedRotation = Math.max(-25, Math.min(25, -pitch));
+    horizonLine.style.transform = `rotate(${clampedRotation}deg)`;
+
+    if (slope === 'UPHILL') {
+      horizonLine.style.backgroundColor = 'var(--color-uphill)';
+      horizonLine.style.boxShadow = '0 0 10px rgba(245, 158, 11, 0.7)';
+    } else if (slope === 'DOWNHILL') {
+      horizonLine.style.backgroundColor = 'var(--color-downhill)';
+      horizonLine.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.7)';
+    } else {
+      horizonLine.style.backgroundColor = '#38bdf8';
+      horizonLine.style.boxShadow = '0 0 10px rgba(56, 189, 248, 0.5)';
+    }
+  }
+
   // Trigger Energy Recovery status banner when going downhill and voltage is generated
   if (recoveryBanner) {
     if (slope === 'DOWNHILL' && voltage > 0.1) {
@@ -398,6 +416,11 @@ function resetDashboardToDisconnected() {
   slopeBadge.className = 'badge badge-slope neutral';
   if (slopeIndicatorText) slopeIndicatorText.textContent = '--';
   if (slopeIndicatorPill) slopeIndicatorPill.className = 'slope-indicator-pill disconnected';
+  if (horizonLine) {
+    horizonLine.style.transform = 'rotate(0deg)';
+    horizonLine.style.backgroundColor = '#475569';
+    horizonLine.style.boxShadow = 'none';
+  }
   if (recoveryBanner) recoveryBanner.classList.add('hidden');
 
   accelX.textContent = '--';

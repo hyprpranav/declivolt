@@ -207,29 +207,29 @@ void calibrateFlatSurface() {
 
 // Slope status with hysteresis to prevent oscillation near the threshold
 // Slope status mapping:
-// Pitch below -3.0 deg = UPHILL (Car tilted upward)
-// Pitch above +3.0 deg = DOWNHILL (Car tilted downward)
+// Pitch above +3.0 deg = UPHILL
+// Pitch below -3.0 deg = DOWNHILL
 // Between -3.0 and +3.0 deg = FLAT
 void updateSlopeStatus(float correctedPitch) {
   if (currentSlopeState == SLOPE_FLAT) {
-    if (correctedPitch < -SLOPE_THRESHOLD) {
+    if (correctedPitch > SLOPE_THRESHOLD) {
       currentSlopeState = SLOPE_UPHILL;
-    } else if (correctedPitch > SLOPE_THRESHOLD) {
+    } else if (correctedPitch < -SLOPE_THRESHOLD) {
       currentSlopeState = SLOPE_DOWNHILL;
     }
   } else if (currentSlopeState == SLOPE_UPHILL) {
-    // Hysteresis release condition (must return above -2.0 deg)
-    if (correctedPitch > (-SLOPE_THRESHOLD + HYSTERESIS_MARGIN)) {
-      if (correctedPitch > SLOPE_THRESHOLD) {
+    // Hysteresis release condition (must return below +2.0 deg)
+    if (correctedPitch < (SLOPE_THRESHOLD - HYSTERESIS_MARGIN)) {
+      if (correctedPitch < -SLOPE_THRESHOLD) {
         currentSlopeState = SLOPE_DOWNHILL;
       } else {
         currentSlopeState = SLOPE_FLAT;
       }
     }
   } else if (currentSlopeState == SLOPE_DOWNHILL) {
-    // Hysteresis release condition (must return below +2.0 deg)
-    if (correctedPitch < (SLOPE_THRESHOLD - HYSTERESIS_MARGIN)) {
-      if (correctedPitch < -SLOPE_THRESHOLD) {
+    // Hysteresis release condition (must return above -2.0 deg)
+    if (correctedPitch > (-SLOPE_THRESHOLD + HYSTERESIS_MARGIN)) {
+      if (correctedPitch > SLOPE_THRESHOLD) {
         currentSlopeState = SLOPE_UPHILL;
       } else {
         currentSlopeState = SLOPE_FLAT;
